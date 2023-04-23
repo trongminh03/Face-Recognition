@@ -22,6 +22,7 @@ images = []
 labels = []
 
 face_cascade = cv2.CascadeClassifier('cascades/haarcascade_frontalface_alt2.xml') 
+eye_cascade = cv2.CascadeClassifier('cascades/eye.xml')
 
 # Load dataset to arrays
 for person_name in os.listdir(dataset_path): 
@@ -43,9 +44,10 @@ X = np.array(images)
 y = np.array(labels) 
 print(X.shape)
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42) 
+print(len(X_train), len(X_test), len(y_train), len(y_test))
 
-n_components = 150
+n_components = 200
 pca = PCA(n_components=n_components, svd_solver='randomized', whiten=True)
 pca.fit(X_train) 
 # pca.fit_transform(X_train)
@@ -73,27 +75,34 @@ y_pred = clf.predict(X_test_pca)
 
 accuracy = accuracy_score(y_test, y_pred)
 print("Accuracy:", accuracy) 
-# print(classification_report(y_test, y_pred, target_names = target_names))
+print(classification_report(y_test, y_pred))
+
+# print("Confusion Matrix is:")
+# print(confusion_matrix(y_test, y_pred, labels = range(7)))
 
 # Use the classifier to recognize faces in an input image
 face_cascade = cv2.CascadeClassifier('cascades/haarcascade_frontalface_alt2.xml')
-# IMG_SIZE = 1850 
-WIDTH = 15
+
+WIDTH = 20
 HEIGHT = 10
 # cap = cv2.VideoCapture(0) 
-img = cv2.imread('test.jpg')
 while True: 
+    img = cv2.imread('test.jpg')
     # ret, frame = cap.read()
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     faces = face_cascade.detectMultiScale(gray, scaleFactor=1.2, minNeighbors=5)
     for (x, y, w, h) in faces:
         face = gray[y:y+h, x:x+w]
+        roi_color = img[y:y + h, x:x + w]
         face_resized = cv2.resize(face, (WIDTH, HEIGHT))
         face_flat = face_resized.flatten()
         # face_flat_pca = pca.transform(face_flat)
         face_pred = clf.predict([face_flat])[0]
         cv2.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2)
         cv2.putText(img, str(face_pred), (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
+        eyes = eye_cascade.detectMultiScale(face)  
+        for (ex, ey, ew, eh) in eyes:
+            cv2.rectangle(roi_color, (ex, ey), (ex + ew, ey + eh), (0, 255, 0), 2)
     cv2.imshow('Face Recognition', img)
     # Exit program when 'q' key is pressed
     if cv2.waitKey(20) & 0xFF == ord('q'):
