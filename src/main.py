@@ -85,25 +85,70 @@ face_cascade = cv2.CascadeClassifier('cascades/haarcascade_frontalface_alt2.xml'
 
 WIDTH = 20
 HEIGHT = 10
-# cap = cv2.VideoCapture(0) 
+
+# while True: 
+#     img = cv2.imread('test2.jpg')
+#     # ret, frame = cap.read()
+#     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+#     # gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+#     faces = face_cascade.detectMultiScale(gray, scaleFactor=1.2, minNeighbors=5)
+#     for (x, y, w, h) in faces:
+#         face = gray[y:y+h, x:x+w]
+#         roi_color = img[y:y + h, x:x + w] 
+#         # roi_color = frame[y:y + w, x:x + w] 
+#         face_resized = cv2.resize(face, (WIDTH, HEIGHT))
+#         face_flat = face_resized.flatten()
+#         # face_flat_pca = pca.transform(face_flat)
+#         face_pred = clf.predict([face_flat])[0]
+#         cv2.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2)
+#         # cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
+#         cv2.putText(img, str(face_pred), (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2) 
+#         # cv2.putText(frame, str(face_pred), (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2) 
+        
+#         # eyes = eye_cascade.detectMultiScale(face)  
+#         # for i in range(2):  
+#         #     ex, ey, ew, eh = eyes[i][0], eyes[i][1], eyes[i][2], eyes[i][3] 
+#         #     cv2.rectangle(roi_color, (ex, ey), (ex + ew, ey + eh), (0, 255, 0), 2) 
+#         # for (ex, ey, ew, eh) in eyes:
+#         #     # print("ex, ey", ex, ey)
+#         #     cv2.rectangle(roi_color, (ex, ey), (ex + ew, ey + eh), (0, 255, 0), 2) 
+                
+#     cv2.imshow('Face Recognition', img) 
+#     # cv2.imshow('Face Recognqition', frame) 
+#     # Exit program when 'q' key is pressed
+#     if cv2.waitKey(20) & 0xFF == ord('q'):
+#         break
+
+cap = cv2.VideoCapture(0) 
 while True: 
-    img = cv2.imread('test.jpg')
-    # ret, frame = cap.read()
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    # img = cv2.imread('test.jpg')
+    ret, frame = cap.read()
+    # gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     faces = face_cascade.detectMultiScale(gray, scaleFactor=1.2, minNeighbors=5)
     for (x, y, w, h) in faces:
         face = gray[y:y+h, x:x+w]
-        roi_color = img[y:y + h, x:x + w]
+        # roi_color = img[y:y + h, x:x + w] 
+        roi_color = frame[y:y + w, x:x + w] 
         face_resized = cv2.resize(face, (WIDTH, HEIGHT))
         face_flat = face_resized.flatten()
         # face_flat_pca = pca.transform(face_flat)
         face_pred = clf.predict([face_flat])[0]
-        cv2.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2)
-        cv2.putText(img, str(face_pred), (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
-        eyes = eye_cascade.detectMultiScale(face)  
-        for (ex, ey, ew, eh) in eyes:
-            cv2.rectangle(roi_color, (ex, ey), (ex + ew, ey + eh), (0, 255, 0), 2)
-    cv2.imshow('Face Recognition', img)
+        # cv2.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2)
+        cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
+        # cv2.putText(img, str(face_pred), (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2) 
+        cv2.putText(frame, str(face_pred), (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2) 
+        
+        # eyes = eye_cascade.detectMultiScale(face)  
+        # for i in range(2):  
+        #     ex, ey, ew, eh = eyes[i][0], eyes[i][1], eyes[i][2], eyes[i][3] 
+        #     cv2.rectangle(roi_color, (ex, ey), (ex + ew, ey + eh), (0, 255, 0), 2) 
+        # for (ex, ey, ew, eh) in eyes:
+        #     # print("ex, ey", ex, ey)
+        #     cv2.rectangle(roi_color, (ex, ey), (ex + ew, ey + eh), (0, 255, 0), 2) 
+                
+    # cv2.imshow('Face Recognition', img) 
+    cv2.imshow('Face Recognition', frame) 
     # Exit program when 'q' key is pressed
     if cv2.waitKey(20) & 0xFF == ord('q'):
         break
