@@ -14,7 +14,7 @@ new_name = path + '_0000'
 print("new_name", new_name)
 counter = 1
 # Iterate over each file in the folder
-for filename in os.listdir("Le Trong Minh/"): 
+for filename in os.listdir(path): 
     tmp_new_name = new_name[:-len(str(counter))]
     # Build the new filename using the base name and the current index
     new_filename = tmp_new_name + str(counter) + '.jpg'
