@@ -48,8 +48,9 @@ print(X.shape)
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42) 
 print(len(X_train), len(X_test), len(y_train), len(y_test))
+print(X_test)
 
-n_components = 200
+n_components = 150
 pca = PCA(n_components=n_components, svd_solver='randomized', whiten=True)
 pca.fit(X_train) 
 # pca.fit_transform(X_train)
@@ -79,31 +80,32 @@ accuracy = accuracy_score(y_test, y_pred)
 print("Accuracy:", accuracy) 
 print(classification_report(y_test, y_pred))
 
-WIDTH = 20
-HEIGHT = 10
-# cap = cv2.VideoCapture(0) 
+# WIDTH = 15
+# HEIGHT = 10
+
+cap = cv2.VideoCapture(0) 
 
 while True: 
-    img = cv2.imread('test.jpg')
-    # ret, frame = cap.read()
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    # gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    # img = cv2.imread('test2.jpg')
+    ret, frame = cap.read()
+    # gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     faces = face_cascade.detectMultiScale(gray, scaleFactor=1.2, minNeighbors=5)
     for (x, y, w, h) in faces:
         face = gray[y:y+h, x:x+w]
-        roi_color = img[y:y + h, x:x + w] 
-        # roi_color = frame[y:y + w, x:x + w] 
+        # roi_color = img[y:y + h, x:x + w] 
         face_resized = cv2.resize(face, (WIDTH, HEIGHT))
         face_flat = face_resized.flatten()
-        # face_flat_pca = pca.transform(face_flat)
-        face_pred = clf.predict([face_flat])[0]
-        cv2.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2)
-        # cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
-        cv2.putText(img, str(face_pred), (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2) 
-        # cv2.putText(frame, str(face_pred), (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2) 
+        arr = np.array(face_flat)
+        face_flat_pca = pca.transform([arr])
+        face_pred = clf.predict(face_flat_pca)[0]
+        # cv2.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2)
+        cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
+        # cv2.putText(img, str(face_pred), (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2) 
+        cv2.putText(frame, str(face_pred), (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2) 
 
-    cv2.imshow('Face Recognition', img) 
-    # cv2.imshow('Face Recognqition', frame) 
+    # cv2.imshow('Face Recognition', img) 
+    cv2.imshow('Face Recognqition', frame) 
     # Exit program when 'q' key is pressed
     if cv2.waitKey(20) & 0xFF == ord('q'):
         break
